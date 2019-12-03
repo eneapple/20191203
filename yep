@@ -1,0 +1,376 @@
+public class Main {
+
+    public static void main(String[] args) {
+	ChatServerFrame cs=new ChatServerFrame();
+	cs.setVisible(true);
+
+        ChatClientFrame cc=new ChatClientFrame();
+        cc.setVisible(true);
+    }
+
+}
+
+--------------------------我是分割線---------------------------------
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class ChatServerFrame extends JFrame {
+    private Container cp;
+    private JTextArea ta =new JTextArea();
+    private JScrollPane jsp=new JScrollPane(ta);
+    private ChatServe chatServe;
+    private JButton jbtnStartServer=new JButton("start server");
+
+    private JPanel msgPanel=new JPanel(new BorderLayout(3,3));
+    private JTextField jtfMsg=new JTextField();
+    private JButton jbtsend=new JButton("Send");
+    private JButton jbtset=new JButton("Set");
+    private JButton jbtexit=new JButton("Exit");
+    private JLabel jlb1=new JLabel("IP:");
+    private JLabel jlb2=new JLabel("port:");
+    private JLabel jlbHostName=new JLabel();
+    private JTextField jtfPort=new JTextField();
+    private JTextField jtfIP=new JTextField();
+    private JPanel jpnHostPane=new JPanel(new GridLayout(1,5,3,3));
+    private JPanel jpnGameZone=new JPanel();
+    private ImageIcon aa=new ImageIcon("1.png");
+    private ImageIcon bb=new ImageIcon("2.png");
+
+
+public static void main(String arg[]){
+    ChatServerFrame mfr=new ChatServerFrame();
+    mfr.setVisible(true);
+}
+
+    public ChatServerFrame(){
+        init();
+    }
+private void init(){
+    this.setTitle("Chat Server");
+    this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+    this.setBounds(100,100,600,500);
+
+    jsp.setPreferredSize(new Dimension(150,600));
+
+    cp=this.getContentPane();
+    cp.setLayout(new BorderLayout(3,3));
+    cp.add(jsp,BorderLayout.EAST);
+    cp.add(jpnGameZone,BorderLayout.CENTER);
+    cp.add(msgPanel,BorderLayout.SOUTH);
+    cp.add(jpnHostPane,BorderLayout.NORTH);
+
+    chatServe=new ChatServe(ChatServerFrame.this);
+    jtfIP.setText(chatServe.getHostIP());
+    jtfIP.setEditable(false);
+
+    jlb2.setHorizontalAlignment(JLabel.RIGHT);
+    jtfPort.setText(Integer.toString(chatServe.getPort()));
+    jpnHostPane.add(jlb1);
+    jpnHostPane.add(jtfIP);
+    jpnHostPane.add(jtfPort);
+    jpnHostPane.add(jbtset);
+    jpnHostPane.add(jbtnStartServer);
+    jpnHostPane.add(jbtexit);
+    msgPanel.add(jtfMsg,BorderLayout.CENTER);
+    msgPanel.add(jbtsend,BorderLayout.EAST);
+    ta.setEditable(false);
+
+    Image img1=aa.getImage();
+//    Image img2=aa.getScaledInstance(80,120,Image.SCALE_SMOOTH);
+
+//    aa.setImage(img2);
+//    jlb1.setIcon(aa);
+
+jbtsend.addActionListener(new AbstractAction() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        if (chatServe !=null && jtfMsg.getText().equals("")){
+            chatServe.sendMsg(jtfMsg.getText());
+            jtfMsg.setText(" ");
+        }
+    }
+});
+jbtnStartServer.addActionListener(new AbstractAction() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        chatServe.start();
+    }
+});
+jbtexit.addActionListener(new AbstractAction() {
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        System.exit(0);
+    }
+});
+
+}
+public void appendMessage(String msg){
+    ta.append(msg+"\n------\n");
+}
+}
+
+--------------------------我是分割線---------------------------------
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.ActionEvent;
+
+public class ChatClientFrame extends JFrame {
+    private Container cp;
+    private JTextArea jta=new JTextArea();
+    private JScrollPane jsp=new JScrollPane(jta);
+    private JPanel jpnControl=new JPanel(new GridLayout(7,1,3,3));
+    private ChatClient chatClient;
+    private JButton jbtnStartServer=new JButton("connect");
+    private JPanel msgPanel=new JPanel(new BorderLayout(3,3));
+    private JTextField jtfMsg=new JTextField();
+    private JTextField jtfIP=new JTextField();
+    private JButton jbtnSend=new JButton("Send");
+    private JButton jbtnExit=new JButton("Exit");
+    private JLabel jlb1=new JLabel("IP:");
+    private JLabel jlb2=new JLabel("Port:");
+    private JLabel jlbHostName=new JLabel();
+    private JTextField jtfPort=new JTextField();
+    private JPanel jpnHostPane=new JPanel(new GridLayout(1,5,3,3));
+
+    public ChatClientFrame(){
+        init();
+    }
+
+    private void init(){
+        this.setDefaultCloseOperation(EXIT_ON_CLOSE);
+        this.setBounds(500,100,600,500);
+        this.setTitle("Client");
+        cp=this.getContentPane();
+        cp.setLayout(new BorderLayout(3,3));
+        cp.add(jsp,BorderLayout.CENTER);
+        cp.add(msgPanel,BorderLayout.SOUTH);
+        cp.add(jpnHostPane,BorderLayout.NORTH);
+        chatClient=new ChatClient();
+        jtfIP.setText("127.0.0.1");
+        jlb1.setHorizontalAlignment(JLabel.RIGHT);
+        jlb2.setHorizontalAlignment(JLabel.RIGHT);
+        jtfPort.setText(Integer.toString(chatClient.getPort()));
+        jpnHostPane.add(jlb1);
+        jpnHostPane.add(jtfIP);
+        jpnHostPane.add(jlb2);
+        jpnHostPane.add(jtfPort);
+        jpnHostPane.add(jbtnStartServer);
+        jpnHostPane.add(jbtnExit);
+
+        msgPanel.add(jtfMsg,BorderLayout.CENTER);
+        msgPanel.add(jbtnSend,BorderLayout.EAST);
+        jta.setBackground(new Color(200,200,255));
+        jta.setEditable(false);
+
+        jbtnSend.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (chatClient != null && !jtfMsg.getText().equals("")) {
+                    chatClient.sendMsg(jtfMsg.getText());
+                    jtfMsg.setText("");
+                }
+            }
+        });
+
+        jbtnStartServer.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JButton tmpBtn=(JButton) e.getSource();
+                if (tmpBtn.isEnabled()) {
+                    chatClient.start();
+                    tmpBtn.setEnabled(false);
+                }
+            }
+        });
+
+        jbtnExit.addActionListener(new AbstractAction() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                chatClient.disConnect();
+                System.exit(0);
+            }
+        });
+
+    }
+    public void appendMessage(String msg){
+        jta.append(msg + "\n---\n");
+    }
+
+    public String getServerIP(){
+        return jtfIP.getText();
+    }
+
+    public int getPort(){
+        return  Integer.parseInt(jtfPort.getText());
+    }
+}
+
+--------------------我是分割線-----------------------------
+
+
+import javax.swing.*;
+import java.awt.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+import java.net.UnknownHostException;
+
+public class ChatServe extends Thread {
+    private String HostIP,HostName;
+    private InetAddress inetAddr;
+    private int port=5300;
+    private ChatServerFrame chatframe;
+    private Socket socket;
+    private InputStream inputstream;
+    private OutputStream outputstream;
+    private ServerSocket serversocket;
+
+
+    public ChatServe(ChatServerFrame frm){
+        this.setDaemon(true);
+        chatframe=frm;
+        try {
+            inetAddr=InetAddress.getLocalHost();
+            HostIP=inetAddr.getHostAddress();
+            HostName=inetAddr.getHostName();
+        }catch (UnknownHostException e){
+            System.out.println("can't find IP information");
+            }
+        }
+        public void run() {
+            byte data[] = new byte[1024];
+            int n = 0;
+            try {
+                serversocket = new ServerSocket(port);
+                chatframe.appendMessage("Server start, waiting client connect");
+
+                chatframe.repaint();
+                socket = serversocket.accept();
+                chatframe.appendMessage("Client connect...");
+                outputstream = socket.getOutputStream();
+
+                while (true) {
+                    inputstream=socket.getInputStream();
+                    n = inputstream.read(data);
+                    if (new String(data,0,n).equals("#disconnected#")){
+                        chatframe.appendMessage("Client:"+new String(data,0,n));
+                        close();
+                        break;
+                    } else{
+                        chatframe.appendMessage("Client=" + new String(data, 0, n));
+                    }
+                }
+            } catch (Exception e) {
+                JOptionPane.showMessageDialog(chatframe, e.toString(), "Error", 1);
+            }
+
+        }
+
+        public void close(){
+        try {
+            outputstream.close();
+            inputstream.close();
+            socket.close();
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(chatframe, e.toString(), "Error", 1);
+        }
+        }
+    public int getPort(){
+        return port;
+    }
+
+
+        public String getHostIP(){
+        return HostIP;
+        }
+
+        public void sendMsg(String msg){
+        if (socket!=null){
+            try {
+                outputstream.write(msg.getBytes());
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(chatframe,e.toString(),"Error",1);
+            }
+
+        }
+        }
+
+    }
+    
+    
+    -------------------------我是分割線------------------------------
+    
+    
+    import javax.swing.*;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.net.InetAddress;
+import java.net.ServerSocket;
+import java.net.Socket;
+
+public class ChatClient extends Thread {
+    private String HostIP, HostName;
+    private InetAddress inetAddr;
+    private int port = 5300;
+    private ChatServerFrame chatframe;
+    private Socket socket;
+    private InputStream inputstream;
+    private OutputStream outputstream;
+    private ServerSocket serversocket;
+
+
+    public void run() {
+        byte data[] = new byte[1024];
+        int n = 0;
+        try {
+            chatframe.appendMessage("Connect to Server...\n");
+//            socket = new Socket(chatframe.getServerIP(), chatframe.getPort());
+            chatframe.appendMessage("Connected !!\n");
+            chatframe.repaint();
+            outputstream = socket.getOutputStream();
+            inputstream = socket.getInputStream();
+            while (true) {
+                n = inputstream.read(data);
+                chatframe.appendMessage("Server:" + new String(data, 0, n));
+            }
+        } catch (Exception e) {
+            JOptionPane.showMessageDialog(chatframe, e.toString(), "Error", 1);
+        }
+    }
+    public void sendMsg(String msg){
+        if (socket !=null){
+            try {
+                outputstream.write(msg.getBytes());
+            }catch (Exception e){
+                JOptionPane.showMessageDialog(chatframe, e.toString(), "send msg Error", 1);
+            }
+        }
+    }
+    public int getPort(){
+        return port;
+    }
+    public void setPort(int newPort){
+        if (newPort>1024 &&newPort<65536){
+            port=newPort;
+        }else {
+            JOptionPane.showMessageDialog(chatframe,"port rang(1024~65536)");
+        }
+    }
+    public void disConnect(){
+        sendMsg("#disConnect#");
+        try {
+            socket.close();
+            inputstream.close();
+            outputstream.close();
+        }catch (Exception e){
+            JOptionPane.showMessageDialog(chatframe, e.toString(), "Conn Error", 1);
+        }
+    }
+
+}
